@@ -1,80 +1,35 @@
-/**
- * Unit tests for the action's entrypoint, src/index.ts
- *
- * These should be run as if the action was called from a workflow.
- * Specifically, the inputs listed in `action.yml` should be set as environment
- * variables following the pattern `INPUT_<INPUT_NAME>`.
- */
+import * as change from '../src/gitchange'
+import { Inputs } from '../src/input'
 
-import * as core from '@actions/core'
-import * as index from '../src/index'
-
-// Mock the GitHub Actions core library
-const debugMock = jest.spyOn(core, 'debug')
-const getInputMock = jest.spyOn(core, 'getInput')
-const setFailedMock = jest.spyOn(core, 'setFailed')
-const setOutputMock = jest.spyOn(core, 'setOutput')
-
-// Mock the action's entrypoint
-const runMock = jest.spyOn(index, 'run')
-
-// Other utilities
-const timeRegex = /^\d{2}:\d{2}:\d{2}/
-
-describe('action', () => {
-  beforeEach(() => {
-    jest.clearAllMocks()
-  })
-
-  it('sets the time output', async () => {
-    // Set the action's inputs as return values from core.getInput()
-    getInputMock.mockImplementation((name: string): string => {
-      switch (name) {
-        case 'milliseconds':
-          return '500'
-        default:
-          return ''
-      }
-    })
-
-    await index.run()
-    expect(runMock).toHaveReturned()
-
-    // Verify that all of the core library functions were called correctly
-    expect(debugMock).toHaveBeenNthCalledWith(1, 'Waiting 500 milliseconds ...')
-    expect(debugMock).toHaveBeenNthCalledWith(
-      2,
-      expect.stringMatching(timeRegex)
-    )
-    expect(debugMock).toHaveBeenNthCalledWith(
-      3,
-      expect.stringMatching(timeRegex)
-    )
-    expect(setOutputMock).toHaveBeenNthCalledWith(
-      1,
-      'time',
-      expect.stringMatching(timeRegex)
-    )
-  })
-
-  it('sets a failed status', async () => {
-    // Set the action's inputs as return values from core.getInput()
-    getInputMock.mockImplementation((name: string): string => {
-      switch (name) {
-        case 'milliseconds':
-          return 'this is not a number'
-        default:
-          return ''
-      }
-    })
-
-    await index.run()
-    expect(runMock).toHaveReturned()
-
-    // Verify that all of the core library functions were called correctly
-    expect(setFailedMock).toHaveBeenNthCalledWith(
-      1,
-      'milliseconds not a number'
-    )
-  })
+it('test file not /', () => {
+  const inputs: Inputs = {
+    directories: 'test/test',
+    token: ''
+  }
+  for (const element of change.inputPattern(inputs).patterns) {
+    expect(element).toBe('test/test/**')
+  }
+})
+it('test file with /', () => {
+  const inputs: Inputs = {
+    directories: 'test/test/',
+    token: ''
+  }
+  for (const element of change.inputPattern(inputs).patterns) {
+    expect(element).toBe('test/test/**')
+  }
+})
+it('test ignore', () => {
+  const inputs: Inputs = {
+    directories: 'test/test',
+    ignore: 'test/test1/,test/tet2/*.md,test/test3.txt,test/test4',
+    separator: ',',
+    token: ''
+  }
+  const result = change.inputPattern(inputs)
+  expect(result.patterns[0]).toBe('test/test/**')
+  expect(result.ignores[0]).toBe('!test/test1/**')
+  expect(result.ignores[1]).toBe('!test/tet2/*.md')
+  expect(result.ignores[2]).toBe('!test/test3.txt')
+  expect(result.ignores[3]).toBe('!test/test4/**')
 })

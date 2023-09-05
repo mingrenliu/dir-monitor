@@ -1,18 +1,26 @@
-name: 'The name of your action here'
-description: 'Provide a description here'
-author: 'Your name or organization here'
+name: 'changed directory'
+description: 'monitor special directory to decide whether have been changed'
+author: 'mingrenliu'
 
 # Define your inputs here.
 inputs:
-  milliseconds:
-    description: 'Your input description here'
+  directories:
+    description: 'monitored special directories'
     required: true
-    default: '1000'
-
+  ignore:
+    description: 'what type file to be ignore'
+    required: false
+  separator:
+    description: 'directory or file separator'
+    required: false
+    default: ';'
+  token:
+    description: 'approval token'
+    required: true
 # Define your outputs here.
 outputs:
-  time:
-    description: 'Your output description here'
+  matrix:
+    description: 'changed directories'
 
 runs:
   using: node16
