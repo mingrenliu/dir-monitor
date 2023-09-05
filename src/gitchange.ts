@@ -35,9 +35,9 @@ async function GetAllChangedFiles(input: Inputs): Promise<string[]> {
   const results: string[] = []
   const octokit = github.getOctokit(input.token)
   const data = await octokit.rest.repos.getCommit({
-    owner: 'mingrenliu', //github.context.repo.owner,
-    repo: 'FreshCattle', //github.context.repo.repo,
-    ref: 'a449575f6ac64ecb71bda17de936ae04f0c48797' //github.context.sha
+    owner: github.context.repo.owner,
+    repo: github.context.repo.repo,
+    ref: github.context.sha
   })
   const files = data.data.files
   if (files && files.length > 0) {
