@@ -13777,7 +13777,7 @@ const AllChangeDirectories = async (input) => {
     for (let index = 0; index < patterns.directories.length; index++) {
         for (const file of files) {
             if (mm.isMatch(file, patterns.patterns[index]) &&
-                (patterns.ignores.length > 0 || mm.isMatch(file, patterns.ignores))) {
+                (patterns.ignores.length === 0 || mm.isMatch(file, patterns.ignores))) {
                 results.push(patterns.directories[index]);
                 break;
             }
@@ -13791,11 +13791,12 @@ async function GetAllChangedFiles(input) {
     const results = [];
     const octokit = github.getOctokit(input.token);
     const data = await octokit.rest.repos.getCommit({
-        owner: 'mingrenliu',
-        repo: 'FreshCattle',
-        ref: 'a449575f6ac64ecb71bda17de936ae04f0c48797' //github.context.sha
+        owner: github.context.repo.owner,
+        repo: github.context.repo.repo,
+        ref: github.context.sha
     });
     const files = data.data.files;
+    core.info(JSON.stringify(files));
     if (files && files.length > 0) {
         for (const item of files) {
             results.push(item.filename);

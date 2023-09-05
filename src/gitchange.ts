@@ -21,7 +21,7 @@ export const AllChangeDirectories = async (
     for (const file of files) {
       if (
         mm.isMatch(file, patterns.patterns[index]) &&
-        (patterns.ignores.length > 0 || mm.isMatch(file, patterns.ignores))
+        (patterns.ignores.length === 0 || mm.isMatch(file, patterns.ignores))
       ) {
         results.push(patterns.directories[index])
         break
@@ -40,6 +40,7 @@ async function GetAllChangedFiles(input: Inputs): Promise<string[]> {
     ref: github.context.sha
   })
   const files = data.data.files
+  core.info(JSON.stringify(files))
   if (files && files.length > 0) {
     for (const item of files) {
       results.push(item.filename)
