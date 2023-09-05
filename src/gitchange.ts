@@ -40,12 +40,12 @@ async function GetAllChangedFiles(input: Inputs): Promise<string[]> {
     ref: github.context.sha
   })
   const files = data.data.files
-  core.info(JSON.stringify(files))
   if (files && files.length > 0) {
     for (const item of files) {
       results.push(item.filename)
     }
   }
+  core.info(`all changed files:${JSON.stringify(results)}`)
   return results
 }
 export function inputPattern(input: Inputs): matchResult {
