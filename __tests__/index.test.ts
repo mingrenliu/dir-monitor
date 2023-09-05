@@ -1,4 +1,4 @@
-import * as change from '../src/gitchange'
+import { inputPattern } from '../src/gitchange'
 import { Inputs } from '../src/input'
 
 it('test file not /', () => {
@@ -6,7 +6,7 @@ it('test file not /', () => {
     directories: 'test/test',
     token: ''
   }
-  for (const element of change.inputPattern(inputs).patterns) {
+  for (const element of inputPattern(inputs).patterns) {
     expect(element).toBe('test/test/**')
   }
 })
@@ -15,7 +15,7 @@ it('test file with /', () => {
     directories: 'test/test/',
     token: ''
   }
-  for (const element of change.inputPattern(inputs).patterns) {
+  for (const element of inputPattern(inputs).patterns) {
     expect(element).toBe('test/test/**')
   }
 })
@@ -26,7 +26,7 @@ it('test ignore', () => {
     separator: ',',
     token: ''
   }
-  const result = change.inputPattern(inputs)
+  const result = inputPattern(inputs)
   expect(result.patterns[0]).toBe('test/test/**')
   expect(result.ignores[0]).toBe('!test/test1/**')
   expect(result.ignores[1]).toBe('!test/tet2/*.md')
